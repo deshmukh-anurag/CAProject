@@ -14,14 +14,40 @@ const RegisterScreen = () => {
           <View style={{ marginTop: 80, alignItems: "center", justifyContent: "center" }}>
             <Text style={{ fontSize: 20, fontWeight: 500, color: "black" }}>Setup your profile</Text>
             <Text style={{ marginTop: 1, color: 'grey', textAlign: 'center', marginHorizontal: 12 }}>Profile are visible to your friends and connections and groups</Text>
-            <Pressable>
-              
+            <Pressable style={{marginTop: 20}}>
+              <Image
+                source={{
+                  uri: image
+                    ? image
+                    : 'https://cdn-icons-png.flaticon.com/128/149/149071.png',
+                }}
+                style={{width: 50, height: 50, borderRadius: 25}}
+              />
+              <Text
+                style={{
+                  textAlign: 'center',
+                  marginTop: 4,
+                  color: 'gray',
+                  fontSize: 12,
+                }}>
+                Add
+              </Text>
             </Pressable>
-            <Text style={{textAlign:'center',marginTop:4,color:'grey',fontSize:12}}>Add</Text>
           </View>
-          <View style={{ marginTop: 50 }}>
-            <View>
+          <View style={{ marginTop: 30 }}>
+          <View>
               <Text style={{ fontSize: 18, fontWeight: 600, color: "grey" }}>
+                Name</Text>
+              <View>
+                <TextInput value={name} onChangeText={setName} placeholderTextColor="#BEBEBE"
+                  style={{ marginTop: 15, borderBottomColor: "#BEBEBE", borderBottomWidth: 1, paddingBottom: 10, width: 320, fontSize: 15 }}
+                  placeholder='Enter  your Name' />
+
+              </View>
+
+            </View>
+            <View>
+              <Text style={{ fontSize: 18, fontWeight: 600, color: "grey" ,marginTop:15}}>
                 Email</Text>
               <View>
                 <TextInput value={email} onChangeText={setEmail} placeholderTextColor="#BEBEBE"
@@ -40,6 +66,17 @@ const RegisterScreen = () => {
                   placeholder='Enter  your password' />
 
               </View>
+              <View>
+              <Text style={{ fontSize: 18, fontWeight: 600, color: "grey",marginTop:15 }}>
+                Image</Text>
+              <View>
+                <TextInput value={image} onChangeText={setImage} placeholderTextColor="#BEBEBE"
+                  style={{ marginTop: 15, borderBottomColor: "#BEBEBE", borderBottomWidth: 1, paddingBottom: 10, width: 320, fontSize: 15 }}
+                  placeholder='Enter  your image url' />
+
+              </View>
+
+            </View>
 
             </View>
             <Pressable style={{ width: 200, backgroundColor: "#4A55A2", padding: 15, marginTop: 50, marginLeft: 'auto', marginRight: 'auto', borderRadius: 6 }}>
