@@ -20,7 +20,7 @@ const RegisterScreen = () => {
   
     console.log("user=======", user); // Log the user object to verify data
 
-    axios.post("http://192.168.13.28:4000/register", user)
+    axios.post("http://10.0.2.2:4000/register", user)
       .then(response => {
         console.log(response.data); // Log the response data
         Alert.alert("Registration successful!", "You have been registered successfully!");
@@ -31,6 +31,8 @@ const RegisterScreen = () => {
         setEmail("");
       })
       .catch(error => {
+        console.log("=============>>", error);
+        
         if (error.response) {
           // Log the error response from the server
           console.log("Server responded with error:", error.response.data);

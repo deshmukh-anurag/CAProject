@@ -11,10 +11,26 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import PeopleScreen from '../screens/PeopleScreen';
 import {NavigationContainer} from '@react-navigation/native';
+import {AuthContext} from '../AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import RequestChatRoom from '../screens/RequestChatRoom';
+import ChatRoom from '../screens/ChatRoom';
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
+  const {token, setToken} = useContext(AuthContext);
+  console.log('token value', token);
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = await AsyncStorage.getItem('authToken');
+      console.log('token from context', token);
+    };
+
+    fetchUser();
+  }, []);
+
+  console.log('token', token);
   function BottomTabs() {
     return (
       <Tab.Navigator>
@@ -88,12 +104,14 @@ const StackNavigator = () => {
           component={PeopleScreen}
           options={{headerShown: false}}
         />
+        <Stack.Screen name="Request" component={RequestChatRoom} />
+        <Stack.Screen name="ChatRoom" component={ChatRoom} />
       </Stack.Navigator>
     );
   }
   return (
     <NavigationContainer>
-      <AuthStack/>
+      {token === null || token === '' ? <AuthStack /> : <MainStack />}
     </NavigationContainer>
   );
 };
