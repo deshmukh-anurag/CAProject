@@ -7,28 +7,37 @@ import {
   View,
   KeyboardAvoidingView,
 } from 'react-native';
-import React, {useContext, useEffect, useLayoutEffect, useState} from 'react';
-import {AuthContext} from '../AuthContext';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { AuthContext } from '../AuthContext';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
 import axios from 'axios';
-import {useSocketContext} from '../SocketContext';
+import { useSocketContext } from '../SocketContext';
 
 const ChatRoom = () => {
   const navigation = useNavigation();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
-  const {token, userId, setToken, setUserId} = useContext(AuthContext);
-  const {socket} = useSocketContext();
+  const { userId } = useContext(AuthContext);
+  const { socket } = useSocketContext();
   const route = useRoute();
+  const scrollViewRef = useRef(null)
+
+  console.log("scrollViewRef===>", scrollViewRef.current);
+
+
   useLayoutEffect(() => {
     return navigation.setOptions({
       headerTitle: '',
       headerLeft: () => (
-        <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
-          <Ionicons name="arrow-back" size={24} color="black" />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <Pressable onPress={() => {
+            navigation.pop()
+          }}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </Pressable>
           <View>
             <Text>{route?.params?.name}</Text>
           </View>
@@ -36,9 +45,9 @@ const ChatRoom = () => {
       ),
     });
   }, []);
-  const listeMessages = () => {
-    const {socket} = useSocketContext();
 
+  const listeMessages = () => {
+    const { socket } = useSocketContext();
     useEffect(() => {
       socket?.on('newMessage', newMessage => {
         newMessage.shouldShake = true;
@@ -50,6 +59,11 @@ const ChatRoom = () => {
   };
 
   listeMessages();
+
+  useEffect(() => {
+    scrollViewRef.current?.scrollToEnd({ animated: true });
+  }, [messages.length])
+
   const sendMessage = async (senderId, receiverId) => {
     try {
       await axios.post('http://10.0.2.2:4000/sendMessage', {
@@ -58,7 +72,7 @@ const ChatRoom = () => {
         message,
       });
 
-      socket.emit('sendMessage', {senderId, receiverId, message});
+      socket.emit('sendMessage', { senderId, receiverId, message });
 
       setMessage('');
 
@@ -69,13 +83,14 @@ const ChatRoom = () => {
       console.log('Error', error);
     }
   };
+
   const fetchMessages = async () => {
     try {
       const senderId = userId;
       const receiverId = route?.params?.receiverId;
 
       const response = await axios.get('http://10.0.2.2:4000/messages', {
-        params: {senderId, receiverId},
+        params: { senderId, receiverId },
       });
 
       setMessages(response.data);
@@ -83,42 +98,43 @@ const ChatRoom = () => {
       console.log('Error', error);
     }
   };
+
   useEffect(() => {
     fetchMessages();
   }, []);
-  console.log('messages', messages);
+
   const formatTime = time => {
-    const options = {hour: 'numeric', minute: 'numeric'};
+    const options = { hour: 'numeric', minute: 'numeric' };
     return new Date(time).toLocaleString('en-US', options);
   };
   return (
-    <KeyboardAvoidingView style={{flex: 1, backgroundColor: 'white'}}>
-      <ScrollView>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: 'white' }}>
+      <ScrollView ref={scrollViewRef}>
         {messages?.map((item, index) => {
           return (
             <Pressable
-            style={[
+              style={[
                 item?.senderId?._id === userId
                   ? {
-                      alignSelf: 'flex-end',
-                      backgroundColor: '#DCF8C6',
-                      padding: 8,
-                      maxWidth: '60%',
-                      borderRadius: 7,
-                      margin: 10,
-                    }
+                    alignSelf: 'flex-end',
+                    backgroundColor: '#DCF8C6',
+                    padding: 8,
+                    maxWidth: '60%',
+                    borderRadius: 7,
+                    margin: 10,
+                  }
                   : {
-                      alignSelf: 'flex-start',
-                      backgroundColor: 'white',
-                      padding: 8,
-                      margin: 10,
-                      borderRadius: 7,
-                      maxWidth: '60%',
-                    },
-            
+                    alignSelf: 'flex-start',
+                    backgroundColor: 'white',
+                    padding: 8,
+                    margin: 10,
+                    borderRadius: 7,
+                    maxWidth: '60%',
+                  },
+
               ]}>
-              <Text style={{fontSize:13,textAlign:"left"}}>{item?.message}</Text>
-              <Text style={{textAlign:"right",fontSize:9,color:"gray",marginTop:4}}>{formatTime(item?.timeStamp)}</Text>
+              <Text style={{ fontSize: 13, textAlign: "left" }}>{item?.message}</Text>
+              <Text style={{ textAlign: "right", fontSize: 9, color: "gray", marginTop: 4 }}>{formatTime(item?.timeStamp)}</Text>
             </Pressable>
           );
         })}
@@ -165,14 +181,17 @@ const ChatRoom = () => {
         </View>
 
         <Pressable
-          onPress={() => sendMessage(userId, route?.params?.receiverId)}
+          onPress={() => {
+            sendMessage(userId, route?.params?.receiverId)
+            fetchMessages();
+          }}
           style={{
             backgroundColor: '#0066b2',
             paddingHorizontal: 12,
             paddingVertical: 8,
             borderRadius: 20,
           }}>
-          <Text style={{textAlign: 'center', color: 'white'}}>Send</Text>
+          <Text style={{ textAlign: 'center', color: 'white' }}>Send</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>

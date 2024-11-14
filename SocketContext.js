@@ -1,6 +1,6 @@
-import {createContext, useContext, useEffect, useState} from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client';
-import {AuthContext} from './AuthContext';
+import { AuthContext } from './AuthContext';
 
 const SocketContext = createContext();
 
@@ -8,12 +8,10 @@ export const useSocketContext = () => {
   return useContext(SocketContext);
 };
 
-export const SocketContextProvider = ({children}) => {
+export const SocketContextProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
-  const {authUser, userId} = useContext(AuthContext);
+  const { authUser, userId } = useContext(AuthContext);
 
-  console.log('auth', authUser)
-  console.log('BABE', authUser);
   useEffect(() => {
     if (authUser) {
       const socket = io('http://10.0.2.2:3000', {
@@ -21,9 +19,7 @@ export const SocketContextProvider = ({children}) => {
           userId: userId,
         },
       });
-
       setSocket(socket);
-
       return () => socket.close();
     } else {
       if (socket) {
@@ -31,10 +27,10 @@ export const SocketContextProvider = ({children}) => {
         setSocket(null);
       }
     }
-  }, []);
+  }, [authUser]);
 
   return (
-    <SocketContext.Provider value={{socket, setSocket}}>
+    <SocketContext.Provider value={{ socket, setSocket }}>
       {children}
     </SocketContext.Provider>
   );

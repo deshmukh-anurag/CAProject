@@ -7,24 +7,26 @@ import {
   TextInput,
   Pressable,
   Image,
-  ScrollView,
 } from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import React, { useContext, useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {AuthContext} from '../AuthContext';
+import { AuthContext } from '../AuthContext';
 import axios from 'axios';
 
 const LoginScreen = () => {
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
-  const {token, setToken} = useContext(AuthContext);
+  const { token, setToken } = useContext(AuthContext);
+
   useEffect(() => {
     if (token) {
-      navigation.replace('MainStack', {screen: 'Main'});
+      navigation.replace('MainStack', { screen: 'Main' });
     }
   }, [token, navigation]);
+
   const handleLogin = () => {
     const user = {
       email: email,
@@ -33,14 +35,16 @@ const LoginScreen = () => {
 
     axios.post('http://10.0.2.2:4000/login', user).then(response => {
       const token = response.data.token;
-      console.log("token",token)
+      console.log("token", token);
       AsyncStorage.setItem('authToken', token);
       setToken(token);
+    }).catch(() => {
     });
+
   };
   return (
-      <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-      <View style={{padding: 10, alignItems: 'center'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+      <View style={{ padding: 10, alignItems: 'center' }}>
         <KeyboardAvoidingView>
           <View
             style={{
@@ -48,14 +52,13 @@ const LoginScreen = () => {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <Text style={{fontSize: 20, fontWeight: '500'}}>
+            <Text style={{ fontSize: 20, fontWeight: '500' }}>
               Login to your account
             </Text>
           </View>
-
-          <View style={{marginTop: 50}}>
+          <View style={{ marginTop: 50 }}>
             <View>
-              <Text style={{fontSize: 18, fontWeight: '600', color: 'gray'}}>
+              <Text style={{ fontSize: 18, fontWeight: '600', color: 'gray' }}>
                 Email
               </Text>
               <View>
@@ -75,7 +78,6 @@ const LoginScreen = () => {
                   placeholder="Enter your email"
                 />
               </View>
-
               <Text
                 style={{
                   fontSize: 18,
@@ -104,10 +106,9 @@ const LoginScreen = () => {
                 />
               </View>
             </View>
-
             <Pressable
               onPress={handleLogin}
-              style={{
+              style={({ pressed }) => [{
                 width: 200,
                 backgroundColor: '#4A55A2',
                 padding: 15,
@@ -115,7 +116,7 @@ const LoginScreen = () => {
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 borderRadius: 6,
-              }}>
+              }, pressed && { opacity: 0.7 }]}>
               <Text
                 style={{
                   color: 'white',
@@ -126,7 +127,6 @@ const LoginScreen = () => {
                 Login
               </Text>
             </Pressable>
-
             <Pressable onPress={() => navigation.navigate('Register')}>
               <Text
                 style={{
@@ -139,7 +139,6 @@ const LoginScreen = () => {
               </Text>
             </Pressable>
           </View>
-
           <View
             style={{
               marginTop: 50,
@@ -147,7 +146,7 @@ const LoginScreen = () => {
               alignItems: 'center',
             }}>
             <Image
-              style={{width: 140, height: 170}}
+              style={{ width: 140, height: 170 }}
               source={require('../images/loginpage.jpg')}
             />
           </View>

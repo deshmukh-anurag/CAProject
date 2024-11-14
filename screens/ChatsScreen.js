@@ -11,9 +11,8 @@ import {AuthContext} from '../AuthContext';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import 'core-js/stable/atob';
-
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {jwtDecode} from 'jwt-decode';
 import axios from 'axios';
@@ -23,7 +22,7 @@ const ChatsScreen = () => {
   const [options, setOptions] = useState(['Chats']);
   const [chats, setChats] = useState([]);
   const [requests, setRequests] = useState([]);
-  const {token, setToken, setUserId, userId} = useContext(AuthContext);
+  const { setToken, setUserId, userId} = useContext(AuthContext);
   const chooseOption = option => {
     if (options.includes(option)) {
       setOptions(options.filter(c => c !== option));
@@ -32,6 +31,7 @@ const ChatsScreen = () => {
     }
   };
   const navigation = useNavigation();
+  const isFocused = useIsFocused()
   const logout = () => {
     clearAuthToken();
   };
@@ -56,16 +56,19 @@ const ChatsScreen = () => {
 
     fetchUser();
   }, []);
+
   useEffect(() => {
-    if (userId) {
+    if (userId && isFocused) {
       getrequests();
     }
-  }, [userId]);
+  }, [userId, isFocused]);
+
   useEffect(() => {
     if (userId) {
       getUser();
     }
   }, [userId]);
+
   const getrequests = async () => {
     try {
       const response = await axios.get(
@@ -77,7 +80,7 @@ const ChatsScreen = () => {
       console.log('error', error);
     }
   };
-  console.log(requests);
+
   const acceptRequest = async requestId => {
     try {
       const response = await axios.post('http://10.0.2.2:4000/acceptrequest', {
@@ -92,6 +95,7 @@ const ChatsScreen = () => {
       console.log('error', error);
     }
   };
+
   const getUser = async () => {
     try {
       const response = await axios.get(`http://10.0.2.2:4000/user/${userId}`);
